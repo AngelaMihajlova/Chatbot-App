@@ -7,6 +7,7 @@ class Citation(BaseModel):
     filename: str
     text: str
     score: float
+    document_id: Optional[str] = None
 
 
 class ChatRequest(BaseModel):

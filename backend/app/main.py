@@ -1,3 +1,4 @@
+import asyncio
 import time
 from contextlib import asynccontextmanager
 
@@ -13,6 +14,7 @@ from app.db.models import Document, DocumentGroup, Group, SystemConfig, User, Us
 from app.db.session import SessionLocal, engine
 from app.services import history as history_svc
 from app.services import storage as storage_svc
+from app.services.realtime import manager as ws_manager
 from app.services.vector import ensure_collection
 
 
@@ -42,6 +44,7 @@ def _retry(fn, label: str, retries: int = 15, delay: float = 3.0):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    ws_manager.bind_loop(asyncio.get_running_loop())
     print(">> waiting for DB")
     _wait_for_db()
     print(">> creating tables")

@@ -32,7 +32,12 @@ def rag_query(question: str, history: List[dict], allowed_doc_ids=None) -> Tuple
     answer = response.choices[0].message.content
 
     citations = [
-        {"filename": r["filename"], "text": r["text"][:300], "score": float(r["score"])}
+        {
+            "filename": r["filename"],
+            "text": r["text"][:300],
+            "score": float(r["score"]),
+            "document_id": r.get("document_id"),
+        }
         for r in results
     ]
     return answer, citations

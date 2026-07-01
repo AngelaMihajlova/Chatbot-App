@@ -22,7 +22,4 @@ export const groupsApi = {
     apiClient.post<Document>(`/groups/${groupId}/documents`, { document_id: documentId }),
   removeDocument: (groupId: string, documentId: string) =>
     apiClient.delete(`/groups/${groupId}/documents/${documentId}`),
-
-  togglePublic: (documentId: string) =>
-    apiClient.patch<Document>(`/documents/${documentId}/public`),
 };

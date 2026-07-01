@@ -14,6 +14,7 @@ import type { Document, Group, GroupMember, User } from "@/types";
 export function GroupsTab() {
   const currentUser = useAuthStore((s) => s.user);
   const isSuperadmin = currentUser?.role === "superadmin";
+  const isAdmin = isSuperadmin || currentUser?.role === "admin";
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [selected, setSelected] = useState<Group | null>(null);
@@ -91,7 +92,7 @@ export function GroupsTab() {
   }
 
   async function handleTogglePublic(docId: string) {
-    await groupsApi.togglePublic(docId);
+    await documentsApi.togglePublic(docId);
     documentsApi.list().then((r) => setAllDocs(r.data));
     if (selected) groupsApi.listDocuments(selected.id).then((r) => setGroupDocs(r.data));
   }
@@ -246,7 +247,7 @@ export function GroupsTab() {
               {groupDocs.map((d) => (
                 <div key={d.id} className="flex items-center gap-2 text-sm py-1">
                   <span className="flex-1 truncate">{d.original_filename}</span>
-                  {isSuperadmin && (
+                  {isAdmin && (
                     <Button
                       variant="ghost"
                       size="sm"

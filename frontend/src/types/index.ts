@@ -46,6 +46,7 @@ export interface Citation {
   filename: string;
   text: string;
   score: number;
+  document_id?: string | null;
 }
 
 export interface Message {

@@ -15,6 +15,7 @@ from app.schemas.group import (
     GroupResponse,
 )
 from app.services import access as access_svc
+from app.services.realtime import manager as ws_manager
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -88,7 +89,8 @@ def add_member(
     if db.query(UserGroup).filter(UserGroup.user_id == req.user_id, UserGroup.group_id == group_id).first():
         raise HTTPException(status_code=400, detail="User already in group")
 
-    membership = UserGroup(user_id=req.user_id, group_id=group_id, role=GroupRole.member)
+    initial_role = GroupRole.admin if target.role in (UserRole.admin, UserRole.superadmin) else GroupRole.member
+    membership = UserGroup(user_id=req.user_id, group_id=group_id, role=initial_role)
     db.add(membership)
     db.commit()
     db.refresh(membership)
@@ -114,8 +116,13 @@ def promote_to_admin(
     if not membership:
         raise HTTPException(status_code=404, detail="Membership not found")
     membership.role = GroupRole.admin
+    promoted_globally = membership.user.role == UserRole.user
+    if promoted_globally:
+        membership.user.role = UserRole.admin
     db.commit()
     db.refresh(membership)
+    if promoted_globally:
+        ws_manager.notify(str(membership.user.id), {"type": "role_updated", "role": membership.user.role.value})
     return GroupMemberResponse(
         user_id=membership.user_id,
         group_id=membership.group_id,

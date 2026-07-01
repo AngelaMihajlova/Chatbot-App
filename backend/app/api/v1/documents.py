@@ -4,8 +4,8 @@ from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_db, require_admin, require_superadmin
-from app.db.models import Document, DocumentStatus, User
+from app.core.deps import get_db, require_admin
+from app.db.models import Document, DocumentStatus, User, UserRole
 from app.db.session import SessionLocal
 from app.schemas.document import DocumentResponse
 from app.services import access as access_svc
@@ -53,11 +53,15 @@ def list_documents(db: Session = Depends(get_db), current_user: User = Depends(r
 def toggle_public(
     document_id: uuid.UUID,
     db: Session = Depends(get_db),
-    _: User = Depends(require_superadmin),
+    current_user: User = Depends(require_admin),
 ):
     doc = db.query(Document).filter(Document.id == document_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
+    if current_user.role != UserRole.superadmin:
+        accessible = access_svc.get_accessible_doc_ids(current_user, db) or []
+        if str(doc.id) not in accessible and str(doc.uploaded_by) != str(current_user.id):
+            raise HTTPException(status_code=403, detail="No access to this document")
     doc.is_public = not doc.is_public
     db.commit()
     db.refresh(doc)

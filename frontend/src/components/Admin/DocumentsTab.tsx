@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Upload, Trash2, RefreshCw, FileText } from "lucide-react";
+import { Upload, Trash2, RefreshCw, FileText, Globe } from "lucide-react";
 import { documentsApi } from "@/api/documents";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +44,11 @@ export function DocumentsTab() {
 
   async function handleSync(id: string) {
     await documentsApi.sync(id);
+    load();
+  }
+
+  async function handleTogglePublic(id: string) {
+    await documentsApi.togglePublic(id);
     load();
   }
 
@@ -115,6 +120,15 @@ export function DocumentsTab() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={doc.is_public ? "Make private" : "Make public"}
+                      className={doc.is_public ? "text-primary" : ""}
+                      onClick={() => handleTogglePublic(doc.id)}
+                    >
+                      <Globe className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"

@@ -1,2 +1,18 @@
+# Env / data
 .env
 data/
+
+# Node
+frontend/node_modules
+frontend/dist
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# TypeScript
+*.tsbuildinfo
+
+.claude

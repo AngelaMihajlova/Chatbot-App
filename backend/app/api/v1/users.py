@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db, require_admin, require_superadmin
-from app.db.models import User, UserRole
+from app.db.models import GroupRole, User, UserGroup, UserRole
 from app.schemas.user import UpdateRoleRequest, UserResponse
+from app.services.realtime import manager as ws_manager
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -38,9 +39,18 @@ def update_role(
     if current_user.role == UserRole.admin and target.role == UserRole.admin:
         raise HTTPException(status_code=403, detail="Admins cannot modify other admins")
 
+    role_changed = target.role != req.role
     target.role = req.role
+    if req.role == UserRole.admin:
+        for membership in db.query(UserGroup).filter(UserGroup.user_id == target.id).all():
+            membership.role = GroupRole.admin
+    elif req.role == UserRole.user:
+        for membership in db.query(UserGroup).filter(UserGroup.user_id == target.id).all():
+            membership.role = GroupRole.member
     db.commit()
     db.refresh(target)
+    if role_changed:
+        ws_manager.notify(str(target.id), {"type": "role_updated", "role": target.role.value})
     return target
 
 

@@ -15,4 +15,6 @@ export const documentsApi = {
   delete: (id: string) => api.delete(`/documents/${id}`),
 
   sync: (id: string) => api.post<Document>(`/documents/${id}/sync`),
+
+  togglePublic: (id: string) => api.patch<Document>(`/documents/${id}/public`),
 };
