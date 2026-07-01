@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Select } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import type { Document, Group, GroupMember, User } from "@/types";
 
 export function GroupsTab() {
@@ -103,13 +103,13 @@ export function GroupsTab() {
   const availableDocs = allDocs.filter((d) => !groupDocIds.has(d.id));
 
   return (
-    <div className="flex gap-6 h-full">
+    <div className="flex gap-6 h-full min-h-0">
       {/* Group list */}
-      <div className="w-64 shrink-0 space-y-3">
-        <h2 className="text-lg font-semibold">Groups</h2>
+      <div className="w-72 shrink-0 flex flex-col min-h-0 space-y-3">
+        <h2 className="text-lg font-semibold shrink-0">Groups</h2>
 
         {isSuperadmin && (
-          <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+          <div className="space-y-2 p-3 border rounded-lg bg-muted/30 shrink-0">
             <Input
               placeholder="Group name"
               value={newGroupName}
@@ -126,7 +126,7 @@ export function GroupsTab() {
           </div>
         )}
 
-        <div className="space-y-1">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1">
           {groups.map((g) => (
             <div
               key={g.id}
@@ -152,12 +152,12 @@ export function GroupsTab() {
         </div>
       </div>
 
-      <Separator orientation="vertical" className="h-auto" />
+      <Separator orientation="vertical" />
 
       {/* Group detail */}
       {selected ? (
-        <div className="flex-1 space-y-6 overflow-y-auto">
-          <div>
+        <div className="flex-1 min-h-0 flex flex-col space-y-6 overflow-y-auto">
+          <div className="shrink-0">
             <h3 className="font-semibold text-base">{selected.name}</h3>
             {selected.description && (
               <p className="text-sm text-muted-foreground">{selected.description}</p>
@@ -165,29 +165,24 @@ export function GroupsTab() {
           </div>
 
           {/* Members */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col min-h-0 space-y-3">
+            <div className="flex items-center gap-2 shrink-0">
               <Users className="h-4 w-4" />
               <span className="font-medium text-sm">Members</span>
             </div>
-            <div className="flex gap-2">
-              <Select
+            <div className="flex gap-2 shrink-0">
+              <Combobox
                 value={selectedUserId}
-                onChange={(e) => setSelectedUserId(e.target.value)}
+                onChange={setSelectedUserId}
+                options={availableUsers.map((u) => ({ value: u.id, label: u.username ?? u.email }))}
+                placeholder="Add a user…"
                 className="flex-1"
-              >
-                <option value="">Add a user…</option>
-                {availableUsers.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.username ?? u.email}
-                  </option>
-                ))}
-              </Select>
+              />
               <Button size="sm" onClick={handleAddMember} disabled={!selectedUserId}>
                 Add
               </Button>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
               {members.map((m) => (
                 <div key={m.user_id} className="flex items-center gap-2 text-sm py-1">
                   <span className="flex-1">{m.username ?? m.email}</span>
@@ -218,32 +213,27 @@ export function GroupsTab() {
             </div>
           </div>
 
-          <Separator />
+          <Separator className="shrink-0" />
 
           {/* Documents */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col min-h-0 space-y-3">
+            <div className="flex items-center gap-2 shrink-0">
               <FileText className="h-4 w-4" />
               <span className="font-medium text-sm">Documents</span>
             </div>
-            <div className="flex gap-2">
-              <Select
+            <div className="flex gap-2 shrink-0">
+              <Combobox
                 value={selectedDocId}
-                onChange={(e) => setSelectedDocId(e.target.value)}
+                onChange={setSelectedDocId}
+                options={availableDocs.map((d) => ({ value: d.id, label: d.original_filename }))}
+                placeholder="Assign a document…"
                 className="flex-1"
-              >
-                <option value="">Assign a document…</option>
-                {availableDocs.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.original_filename}
-                  </option>
-                ))}
-              </Select>
+              />
               <Button size="sm" onClick={handleAssignDoc} disabled={!selectedDocId}>
                 Assign
               </Button>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
               {groupDocs.map((d) => (
                 <div key={d.id} className="flex items-center gap-2 text-sm py-1">
                   <span className="flex-1 truncate">{d.original_filename}</span>

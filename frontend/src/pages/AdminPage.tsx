@@ -17,8 +17,8 @@ export function AdminPage() {
   const isAdmin = user?.role === "admin" || isSuperadmin;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b px-6 py-3 flex items-center justify-between">
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
+      <header className="border-b px-6 py-3 flex items-center justify-between shrink-0">
         <div>
           <h1 className="font-semibold">Admin Panel</h1>
           <p className="text-xs text-muted-foreground">{user?.email}</p>
@@ -28,29 +28,29 @@ export function AdminPage() {
         </Button>
       </header>
 
-      <main className="p-6 max-w-6xl mx-auto">
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList>
+      <main className="flex-1 min-h-0 overflow-hidden p-6 max-w-7xl mx-auto w-full flex flex-col">
+        <Tabs value={tab} onValueChange={setTab} className="flex-1 min-h-0 flex flex-col">
+          <TabsList className="shrink-0">
             <TabsTrigger value="documents">Documents</TabsTrigger>
             {isAdmin && <TabsTrigger value="groups">Groups</TabsTrigger>}
             {isSuperadmin && <TabsTrigger value="users">Users</TabsTrigger>}
             {isSuperadmin && <TabsTrigger value="settings">Settings</TabsTrigger>}
           </TabsList>
-          <TabsContent value="documents" className="mt-6">
+          <TabsContent value="documents" className="mt-6 flex-1 min-h-0 overflow-y-auto">
             <DocumentsTab />
           </TabsContent>
           {isAdmin && (
-            <TabsContent value="groups" className="mt-6">
+            <TabsContent value="groups" className="mt-6 flex-1 min-h-0 overflow-hidden">
               <GroupsTab />
             </TabsContent>
           )}
           {isSuperadmin && (
-            <TabsContent value="users" className="mt-6">
+            <TabsContent value="users" className="mt-6 flex-1 min-h-0 overflow-y-auto">
               <UsersTab />
             </TabsContent>
           )}
           {isSuperadmin && (
-            <TabsContent value="settings" className="mt-6">
+            <TabsContent value="settings" className="mt-6 flex-1 min-h-0 overflow-y-auto">
               <SettingsTab />
             </TabsContent>
           )}
