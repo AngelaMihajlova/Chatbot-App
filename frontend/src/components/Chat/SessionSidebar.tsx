@@ -21,21 +21,27 @@ export function SessionSidebar({ sessions, currentId, onSelect, onNew, onDelete 
   return (
     <div className="flex flex-col h-full w-64 border-r bg-muted/30">
       <div className="p-3 flex items-center justify-between">
-        <span className="font-semibold text-sm">Chats</span>
-        <Button size="icon" variant="ghost" onClick={onNew} title="New chat">
+        <span className="font-bold text-base tracking-tight text-gray-800">Chats</span>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={onNew}
+          title="New chat"
+          className="rounded-full border border-border/60 bg-gradient-to-b from-white to-gray-50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+        >
           <Plus className="h-4 w-4" />
         </Button>
       </div>
       <Separator />
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {sessions.length === 0 && (
           <p className="text-xs text-muted-foreground text-center mt-4">No conversations yet</p>
         )}
         {sessions.map((s) => (
           <div
             key={s.session_id}
-            className={`group flex items-center gap-2 rounded-md px-2 py-1.5 cursor-pointer text-sm hover:bg-accent ${
-              currentId === s.session_id ? "bg-accent font-medium" : ""
+            className={`group flex items-center gap-2 rounded-xl border border-border/60 bg-white px-3 py-2 cursor-pointer text-sm shadow-sm transition-all duration-200 hover:shadow-md hover:border-border ${
+              currentId === s.session_id ? "bg-accent border-accent font-medium shadow-md" : ""
             }`}
             onClick={() => onSelect(s.session_id)}
           >
@@ -51,20 +57,36 @@ export function SessionSidebar({ sessions, currentId, onSelect, onNew, onDelete 
         ))}
       </div>
       <Separator />
-      <div className="p-3 space-y-1">
+      <div className="p-3 space-y-2">
         {isAdmin && (
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2"
+            className="
+                w-full
+                justify-start
+                gap-2
+                rounded-xl
+                border
+                border-border/60
+                bg-gradient-to-b
+                from-white
+                to-gray-50
+                shadow-md
+                -translate-y-0.5
+                transition-all
+                duration-200
+              "
             onClick={() => navigate("/admin")}
           >
             <ShieldCheck className="h-4 w-4" />
             Admin panel
           </Button>
         )}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground truncate">{user?.email}</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate rounded-lg border border-gray-200 bg-gradient-to-br from-gray-100 to-gray-200/80 px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm">
+            {user?.email}
+          </span>
           <Button
             variant="ghost"
             size="sm"

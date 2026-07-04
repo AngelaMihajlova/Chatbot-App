@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "./MessageBubble";
 import { CitationsPanel } from "./CitationsPanel";
+import { useAuthStore } from "@/store/authStore";
 import type { Citation, Message } from "@/types";
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export function ChatWindow({ sessionId, onSessionCreated }: Props) {
+  const { user } = useAuthStore();
+  const displayName = user?.username || user?.email?.split("@")[0] || "there";
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,8 +71,13 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6">
           {messages.length === 0 && (
-            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-              Ask anything about your company's knowledge base.
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#696969]">
+                Hey {displayName},
+              </h1>
+              <p className="mt-3 text-sm sm:text-base font-bold text-black">
+                Ask anything about your company's knowledge base.
+              </p>
             </div>
           )}
           {messages.map((m, i) => (
@@ -89,11 +97,24 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
         <div className="border-t p-4">
           <div className="flex gap-2 max-w-3xl mx-auto">
             <Textarea
+               className="
+                  rounded-2xl
+                  border
+                  border-gray-300
+                  bg-gradient-to-b
+                  from-white
+                  to-gray-100
+                  shadow-md
+                  focus:shadow-xl
+                  focus:ring-2
+                  focus:ring-gray-300
+                  transition-all
+                  resize-none min-h-[44px] max-h-32
+              "
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
-              className="resize-none min-h-[44px] max-h-32"
+              placeholder="Type a message..."
               rows={1}
             />
             <Button onClick={send} disabled={loading || !input.trim()} size="icon">
