@@ -30,6 +30,7 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
       return;
     }
     setCitations(null);
+    setSourcesCollapsed(false);
     if (!sessionId) {
       setMessages([]);
       return;
@@ -63,6 +64,7 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
       };
       setMessages((m) => [...m, assistantMsg]);
       setCitations(cits);
+      setSourcesCollapsed(false);
     } finally {
       setLoading(false);
     }
@@ -76,8 +78,8 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden">
-      <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="relative flex flex-1 overflow-hidden">
+      <div className="flex flex-col overflow-hidden w-[calc(100%-320px)]">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6">
           {messages.length === 0 && (

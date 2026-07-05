@@ -26,7 +26,7 @@ export function CitationsPanel({ citations, collapsed, onToggleCollapsed }: Prop
 
   if (collapsed) {
     return (
-      <div className="w-10 border-l flex flex-col items-center gap-2 bg-background py-3">
+      <div className="absolute right-0 top-0 h-full w-10 border-l flex flex-col items-center gap-2 bg-background py-3 z-10">
         <Button size="icon" variant="ghost" onClick={onToggleCollapsed} title="Expand sources">
           <ChevronLeft className="h-4 w-4" />
         </Button>
