@@ -20,9 +20,16 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [citations, setCitations] = useState<Citation[] | null>(null);
+  const [sourcesCollapsed, setSourcesCollapsed] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const pendingSessionRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (pendingSessionRef.current !== null && pendingSessionRef.current === sessionId) {
+      pendingSessionRef.current = null;
+      return;
+    }
+    setCitations(null);
     if (!sessionId) {
       setMessages([]);
       return;
@@ -44,7 +51,10 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
     try {
       const res = await chatApi.send(text, sessionId ?? undefined);
       const { session_id, message, citations: cits } = res.data;
-      if (!sessionId) onSessionCreated(session_id);
+      if (!sessionId) {
+        pendingSessionRef.current = session_id;
+        onSessionCreated(session_id);
+      }
       const assistantMsg: Message = {
         role: "assistant",
         content: message,
@@ -52,7 +62,7 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
         citations: cits,
       };
       setMessages((m) => [...m, assistantMsg]);
-      if (cits.length > 0) setCitations(cits);
+      setCitations(cits);
     } finally {
       setLoading(false);
     }
@@ -124,8 +134,12 @@ export function ChatWindow({ sessionId, onSessionCreated }: Props) {
         </div>
       </div>
 
-      {/* Citations panel */}
-      {citations && <CitationsPanel citations={citations} onClose={() => setCitations(null)} />}
+      {/* Sources panel */}
+      <CitationsPanel
+        citations={citations}
+        collapsed={sourcesCollapsed}
+        onToggleCollapsed={() => setSourcesCollapsed((c) => !c)}
+      />
     </div>
   );
 }

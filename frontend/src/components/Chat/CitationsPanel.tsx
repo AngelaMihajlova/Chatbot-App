@@ -1,11 +1,12 @@
-import { X, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import type { Citation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
-  citations: Citation[];
-  onClose: () => void;
+  citations: Citation[] | null;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 }
 
 function groupBySource(citations: Citation[]) {
@@ -19,18 +20,44 @@ function groupBySource(citations: Citation[]) {
   return groups;
 }
 
-export function CitationsPanel({ citations, onClose }: Props) {
-  const groups = groupBySource(citations);
+export function CitationsPanel({ citations, collapsed, onToggleCollapsed }: Props) {
+  const groups = citations ? groupBySource(citations) : [];
+  const count = citations?.length ?? 0;
+
+  if (collapsed) {
+    return (
+      <div className="w-10 border-l flex flex-col items-center gap-2 bg-background py-3">
+        <Button size="icon" variant="ghost" onClick={onToggleCollapsed} title="Expand sources">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="mt-2 text-[10px] font-medium text-muted-foreground [writing-mode:vertical-rl] rotate-180">
+          Sources
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-72 border-l flex flex-col bg-background">
+    <div className="w-80 border-l flex flex-col bg-background">
       <div className="flex items-center justify-between p-3 border-b">
-        <span className="text-sm font-medium">Sources</span>
-        <Button size="icon" variant="ghost" onClick={onClose}>
-          <X className="h-4 w-4" />
+        <div className="flex items-baseline gap-2">
+          <span className="text-sm font-medium">Sources</span>
+          {count > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {count} source{count !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+        <Button size="icon" variant="ghost" onClick={onToggleCollapsed} title="Collapse sources">
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {count === 0 && (
+          <p className="text-xs text-muted-foreground text-center mt-4">
+            Click a message's "sources" link to view its references here.
+          </p>
+        )}
         {groups.map((group) => (
           <div key={group.key} className="rounded-lg border p-3 space-y-2">
             <div className="flex items-center gap-2">
